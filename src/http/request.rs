@@ -4,20 +4,18 @@ use std::error::Error;
 use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
 use std::str::{self, Utf8Error};
 
-pub struct Request {
-    path: String,
-    query_string: Option<String>,
+pub struct Request<'buf> {
+    path: &'buf str,
+    query_string: Option<&'buf str>,
     method: Method,
 }
 
-impl TryFrom<&[u8]> for Request {
+impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
     type Error = ParseError;
 
     // Format:
     // GET /serach?name=abc&sort=1 HTTP/1.1
-    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        let mut buf = [0; 1024];
-
+    fn try_from(buf: &'buf [u8]) -> Result<Request<'buf>, Self::Error> {
         let request = str::from_utf8(&buf)?;
 
         // original request variable is not being being reassigned or used anymore, it is
@@ -40,7 +38,11 @@ impl TryFrom<&[u8]> for Request {
             path = &path[..i];
         }
 
-        unimplemented!()
+        Ok(Self {
+            path,
+            query_string,
+            method,
+        })
     }
 }
 

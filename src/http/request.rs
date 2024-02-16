@@ -23,7 +23,7 @@ impl TryFrom<&[u8]> for Request {
         // original request variable is not being being reassigned or used anymore, it is
         // reusing variable names locally, known as variable shadowing
         let (method, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
-        let (path, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
+        let (mut path, request) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
         let (protocol, _) = get_next_word(request).ok_or(ParseError::InvalidRequest)?;
 
         if protocol != "HTTP/1.1" {
@@ -31,6 +31,14 @@ impl TryFrom<&[u8]> for Request {
         }
 
         let method: Method = method.parse()?;
+
+        let mut query_string = None;
+
+        // Don't care about a None case/pattern matching, only a single result from the match, use "if let":
+        if let Some(i) = path.find('?') {
+            query_string = Some(&path[i + 1..]);
+            path = &path[..i];
+        }
 
         unimplemented!()
     }

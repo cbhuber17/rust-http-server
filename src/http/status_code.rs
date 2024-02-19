@@ -1,4 +1,4 @@
-use std::fmt::{write, Display, Formatter, Result as FmtResult};
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
 // This derive Copy/Clone allows to cast the enum as a uint in the fmt fn below
 // Debug allows to print the object to console

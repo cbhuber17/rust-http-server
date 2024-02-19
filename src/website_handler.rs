@@ -18,7 +18,7 @@ impl WebsiteHandler {
         // Unix-line canonical path, removes "../../../" etc.
         match fs::canonicalize(path) {
             Ok(path) => {
-                if path.starts_with(&self.public_path) {
+                if path.starts_with(fs::canonicalize(&self.public_path).unwrap()) {
                     fs::read_to_string(path).ok()
                 } else {
                     println!("Directory Traversal Attack Attempted: {}", file_path);
